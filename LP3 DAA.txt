@@ -1,0 +1,135 @@
+DAA 01:   Write a program to calculate Fibonacci numbers and find its step count.
+
+d# Recursive approach with step counter and series display
+def fibonacci_recursive(n, steps=[0]):
+    if n <= 1:
+        return n
+    steps[0] += 1
+    return fibonacci_recursive(n - 1, steps) + fibonacci_recursive(n - 2, steps)
+
+# Iterative approach with step counter and series display
+def fibonacci_iterative(n):
+    series = []
+    a, b = 0, 1
+    steps = 0
+    for _ in range(n):
+        series.append(a)
+        a, b = b, a + b
+        steps += 1
+    return series, steps
+
+# Main function to calculate Fibonacci and print results
+def main(n):
+    # Recursive approach
+    steps_recursive = [0]  # Using list to pass by reference for step counting
+    fib_series_recursive = [fibonacci_recursive(i, steps_recursive) for i in range(n)]
+    print("Recursive approach:")
+    print(f"Fibonacci series up to {n} terms: {fib_series_recursive}")
+    print(f"Steps (Recursive): {steps_recursive[0]}")
+
+    # Iterative approach
+    fib_series_iterative, steps_iterative = fibonacci_iterative(n)
+    print("\nIterative approach:")
+    print(f"Fibonacci series up to {n} terms: {fib_series_iterative}")
+    print(f"Steps (Iterative): {steps_iterative}")
+
+# Test with example value of n
+n = 10
+main(n)
+
+
+
+
+
+
+
+
+DAA 02:   Implement job sequencing with deadlines using a greedy method 
+
+class Job:
+    def __init__(self, job_id, profit, deadline):
+        self.job_id, self.profit, self.deadline = job_id, profit, deadline
+
+def job_sequencing(jobs):
+    jobs.sort(key=lambda x: x.profit, reverse=True)
+    slots, total_profit = [None] * max(job.deadline for job in jobs), 0
+    for job in jobs:
+        for j in range(job.deadline - 1, -1, -1):
+            if slots[j] is None:
+                slots[j], total_profit = job, total_profit + job.profit
+                break
+    return [(job.job_id, job.profit) for job in slots if job], total_profit
+
+# Example usage
+jobs = [Job('Job1', 100, 2), Job('Job2', 19, 1), Job('Job3', 27, 2), Job('Job4', 25, 1), Job('Job5', 15, 3)]
+print("Input Jobs:")
+for job in jobs: print(f"{job.job_id}: Profit = {job.profit}, Deadline = {job.deadline}")
+scheduled_jobs, max_profit = job_sequencing(jobs)
+print("\nScheduled Jobs with Profit:")
+for job_id, profit in scheduled_jobs: print(f"{job_id}: Profit = {profit}")
+print(f"\nMaximum Profit: {max_profit}")
+
+
+
+
+
+
+
+
+DAA 03:   Write a program to solve a fractional Knapsack problem using a greedy method
+
+class Item:
+    def __init__(self, profit, weight):
+        self.profit, self.weight = profit, weight
+
+def fractional_knapsack(items, capacity):
+    items.sort(key=lambda x: x.profit / x.weight, reverse=True)
+    total_profit = 0.0
+    for item in items:
+        if capacity == 0: break
+        if item.weight <= capacity:
+            total_profit += item.profit
+            capacity -= item.weight
+        else:
+            total_profit += item.profit * (capacity / item.weight)
+            capacity = 0
+    return total_profit
+
+# Example usage
+items = [Item(60, 10), Item(100, 20), Item(120, 30)]
+capacity = 50
+print(f"Maximum Profit: {fractional_knapsack(items, capacity):.2f}")
+
+
+
+
+
+
+
+
+
+
+
+DAA 04:   Write a program to solve a 0-1 Knapsack problem using dynamic programming or branch and bound strategy
+
+def knapsack_dp(weights, profits, capacity):
+    n, dp = len(profits), [0] * (capacity + 1)
+    for i in range(n):
+        for w in range(capacity, weights[i] - 1, -1):
+            dp[w] = max(dp[w], profits[i] + dp[w - weights[i]])
+    
+    max_profit, w = dp[capacity], capacity
+    items_selected = [i for i in range(n - 1, -1, -1) if w >= weights[i] and dp[w] == profits[i] + dp[w - weights[i]] and (w := w - weights[i])]
+
+    return max_profit, items_selected
+
+# Example usage
+weights = [10, 20, 30]
+profits = [60, 100, 120]
+capacity = 50
+
+max_profit, items_selected = knapsack_dp(weights, profits, capacity)
+print(f"Maximum Profit: {max_profit}")
+print(f"Items Selected (0-based indices): {items_selected}")
+
+
